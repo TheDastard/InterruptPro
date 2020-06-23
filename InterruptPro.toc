@@ -1,0 +1,8 @@
+## Interface: 80300
+## Title: Interrupt Pro
+## Author: TheDastard
+## Version: 0.0.1
+## Notes: ToDo
+## SavedVariables: InterruptProDB
+
+InterruptPro.lua
