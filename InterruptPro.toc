@@ -2,7 +2,12 @@
 ## Title: Interrupt Pro
 ## Author: TheDastard
 ## Version: 0.0.1
-## Notes: ToDo
+## Notes: Tool for coordinating interrupts in Mythic+ and raids
+## OptionalDependencies: LibStub, Ace3
 ## SavedVariables: InterruptProDB
+
+#@no-lib-strip@
+libs\libs.xml
+#@end-no-lib-strip@
 
 InterruptPro.lua
