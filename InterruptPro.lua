@@ -34,12 +34,21 @@ local defaultSavedVars = {
 			hide = false,
 			lock = false
 		},
+		enemyGuide = {
+			expansionIndex = 1,
+			dungeonIndex = 1,
+			enemyIndex = 1
+		},
 		devMode = {
 			enabled = false,
 			debugLevel = 1
 		}
 	}
 }
+
+function InterruptPro:GetDB()
+	return db
+end
 
 do
 	local frame = CreateFrame("Frame")
@@ -54,6 +63,8 @@ do
 			local Icon = LibStub("LibDBIcon-1.0")
 			db = AceDB:New("InterruptProDB", defaultSavedVars).global
 			Icon:Register("InterruptPro", dataBroker, db.minimap)
+
+			InterruptPro:Debug("DevMode enabled")
 		end
 	end
 end
@@ -62,19 +73,22 @@ end
 -- Debug --
 -----------
 
+local debugColor = "|c000070de"
+
 function InterruptPro:ToggleDevMode()
 	db.devMode.enabled = not db.devMode.enabled
 	if db.devMode.enabled then
-		print("InterruptPro - DevMode enabled")
+		InterruptPro:Debug("DevMode enabled")
 	else
-		print("InterruptPro - DevMode disabled")
+		-- InteruptPro:Debug() is disabled so have to manually color text
+		print(debugColor ..  "InterruptPro:|r DevMode disabled")
 	end
 end
 
 function InterruptPro:Debug(text, level)
 	if not db.devMode.enabled then return end
 	if (level or 1) <= db.devMode.debugLevel then
-		print("InterruptPro: " .. text)
+		print(debugColor .. "InterruptPro:|r " .. text)
 	end
 end
 
@@ -151,92 +165,4 @@ do
 			Icon:Show("InterruptPro")
 		end
 	end
-end
-
------------------
--- Enemy Guide --
------------------
-
--- TODO - Move to separate Lua file
-local bfaDungeons = {
-	"Atal'Dazar",
-	"Freehold",
-	"King's Rest",
-	"Mechagon - Junkyard",
-	"Mechagon - Workshop",
-	"Shrine of the Storm",
-	"Siege of Boralus",
-	"Temple of Sethraliss",
-	"The MOTHERLODE!!",
-	"The Underrot",
-	"Tol Dagor",
-	"Waycrest Manor"
-}
-
--- TODO - Move to separate Lua file
-local atalDazarEnemies = {
-	"Dazar'ai Honor Guard",
-	"Dazar'ai Juggernaut",
-	"Dazar'ai Confessor",
-	"Dazar'ai Augur",
-	"Dazar'ai Colossus",
-	"Gilded Priestess",
-	"Priestess Alun'za",
-	"Shadowblade Stalker",
-	"Reanimated Honor Guard",
-	"Reanimated Totem",
-	"Zanchuli Witch-Doctor",
-	"Shieldbearer of Zul",
-	"Vol'kaal",
-	"Toxic Saurid",
-	"Feasting Skyscreamer",
-	"Rezan",
-	"Dinomancer Kish'o",
-	"T'lonja",
-	"Monzumi",
-	"Yazma"
-}
-
-function InterruptPro:CreateEnemyGuide()
-	local AceGUI = LibStub("AceGUI-3.0")
-
-	-- Create a container frame
-	local window = AceGUI:Create("Window")
-	window:SetTitle("Interrupt Pro")
-	window:SetLayout("List")
-	window:EnableResize(false)
-
-	-- TODO - Organize into two separate columns
-	-- Left Column
-	-- local leftContainer = AceGUI:Create("DropdownGroup")
-	-- leftContainer:SetGroupList(bfaDungeons)
-	-- window:AddChild(leftContainer)
-	-- local leftContainer = AceGUI:Create("SimpleGroup")
-	-- leftContainer:SetLayout("List")
-	-- leftContainer:setWidth(window:GetWidth() / 2)
-	-- leftContainer:setHeight(window:GetHeight())
-	-- window:AddChild(leftContainer)
-
-	-- Right Column
-
-	-- Create dungeon dropdown list
-	local dungeonDropdown = AceGUI:Create("Dropdown")
-	dungeonDropdown:SetLabel("Dungeon:")
-	dungeonDropdown:SetList(bfaDungeons)
-	window:AddChild(dungeonDropdown)
-
-	-- Create enemy downdown list
-	local enemiesDropdown = AceGUI:Create("Dropdown")
-	enemiesDropdown:SetLabel("Enemy:")
-	enemiesDropdown:SetList(atalDazarEnemies)
-	window:AddChild(enemiesDropdown)
-
-	InterruptPro:Debug("Creating new EnemyGuide frame - This should only be called once!")
-
-	return window
-end
-
-function InterruptPro:ShowEnemyGuide()
-	InterruptPro.EnemyGuide = InterruptPro.EnemyGuide or InterruptPro:CreateEnemyGuide()
-	InterruptPro.EnemyGuide:Show()
 end

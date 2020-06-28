@@ -11,3 +11,6 @@ libs\libs.xml
 #@end-no-lib-strip@
 
 InterruptPro.lua
+
+EnemyGuide.lua
+BattleForAzeroth\bfa.xml
