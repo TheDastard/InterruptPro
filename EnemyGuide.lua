@@ -1,11 +1,19 @@
+-- Made by: Dastard - Skullcrusher US - <Death and Destruction> --
+
+local InterruptPro = InterruptPro
+local db
+
+-- Caches local variables
+-- TODO
 
 -----------------
 -- Enemy Guide --
 -----------------
 
-local InterruptPro = InterruptPro
-local db
+InterruptPro.EnemyGuide = {}
+local EnemyGuide = InterruptPro.EnemyGuide
 
+InterruptPro.dungeons = {}
 InterruptPro.dungeonEnemies = {}
 
 local expansions = {
@@ -39,79 +47,109 @@ local shadowlandsDungeons = {
 	[8] = "Spires of Ascension"
 }
 
-local dungeons = {
+InterruptPro.dungeons = {
 	[1] = bfaDungeons,
 	[2] = shadowlandsDungeons
 }
 
-function InterruptPro:CreateEnemyGuide()
+function EnemyGuide:Create()
 	db = InterruptPro:GetDB()
 
 	local AceGUI = LibStub("AceGUI-3.0")
 
-	-- Create window
+	-- TODO - Review all of these values
+
+	-- Create main window
 	local window = AceGUI:Create("Window")
 	window:SetTitle("Interrupt Pro - Enemy Guide")
-	window:SetLayout("List")
+	window:SetLayout("Flow")
 	window:EnableResize(false)
 
-	-- TODO - Organize into two separate columns
 	-- Left Column
-	-- local leftContainer = AceGUI:Create("DropdownGroup")
-	-- leftContainer:SetGroupList(bfaDungeons)
-	-- window:AddChild(leftContainer)
-	-- local leftContainer = AceGUI:Create("SimpleGroup")
-	-- leftContainer:SetLayout("List")
-	-- leftContainer:setWidth(window:GetWidth() / 2)
-	-- leftContainer:setHeight(window:GetHeight())
-	-- window:AddChild(leftContainer)
+	do
+		-- Create left column
+		local leftContainer = AceGUI:Create("SimpleGroup")
+		window.leftContainer = leftContainer
+		leftContainer:SetLayout("List")
+		leftContainer:SetWidth(window.frame:GetWidth() / 2)
+		leftContainer:SetHeight(window.frame:GetHeight())
+		window:AddChild(leftContainer)
+
+		-- Create dropdown group
+		local dropdownContainer = AceGUI:Create("InlineGroup")
+		window.dropdownContainer = dropdownContainer
+		--dropdownContainer.frame:SetBackdropColor(1, 1, 1, 0)
+		dropdownContainer:SetWidth(leftContainer.frame:GetWidth() - 20)
+		dropdownContainer:SetHeight(200)
+		dropdownContainer:SetLayout("List")
+		leftContainer:AddChild(dropdownContainer)
+
+		-- Create expansion dropdown
+		local expansionDropdown = AceGUI:Create("Dropdown")
+		window.expansionDropdown = expansionDropdown
+		expansionDropdown:SetLabel("Expansion:")
+		expansionDropdown:SetList(expansions)
+		expansionDropdown:SetValue(db.enemyGuide.expansionIndex)
+		--expansionDropdown:SetWidth(dropdownContainer.frame:GetWidth() - 25)
+		expansionDropdown:SetCallback("OnValueChanged", function(widget, callbackName, key)
+			InterruptPro:OnExpansionChanged(key)
+		end)
+		dropdownContainer:AddChild(expansionDropdown)
+
+		-- Create dungeon dropdown
+		local dungeonDropdown = AceGUI:Create("Dropdown")
+		window.dungeonDropdown = dungeonDropdown
+		dungeonDropdown:SetLabel("Dungeon:")
+		--dungeonDropdown:SetWidth(dropdownContainer.frame:GetWidth() - 25)
+		dungeonDropdown:SetCallback("OnValueChanged", function(widget, callbackN1ame, key)
+			InterruptPro:OnDungeonChanged(key)
+		end)
+		dropdownContainer:AddChild(dungeonDropdown)
+
+		-- Create enemy downdown
+		local enemyDropdown = AceGUI:Create("Dropdown")
+		window.enemyDropdown = enemyDropdown
+		enemyDropdown:SetLabel("Enemy:")
+		--enemyDropdown:SetWidth(dropdownContainer.frame:GetWidth() - 25)
+		enemyDropdown:SetCallback("OnValueChanged", function(widget, callbackName, key)
+			InterruptPro:OnEnemyChanged(key)
+		end)
+		dropdownContainer:AddChild(enemyDropdown)
+	end
 
 	-- Right Column
+	do
+		-- Create right column
+		local rightContainer = AceGUI:Create("SimpleGroup")
+		window.rightContainer = rightContainer
+		rightContainer:SetLayout("List")
+		rightContainer:SetWidth(window.frame:GetWidth() / 2)
+		rightContainer:SetHeight(window.frame:GetHeight())
+		window:AddChild(rightContainer)
 
-	-- Create expansion dropdown
-	local expansionDropdown = AceGUI:Create("Dropdown")
-	expansionDropdown:SetLabel("Expansion:")
-	expansionDropdown:SetList(expansions)
-	expansionDropdown:SetValue(db.enemyGuide.expansionIndex)
-	expansionDropdown:SetCallback("OnValueChanged", function(widget, callbackName, key)
-		InterruptPro:OnExpansionChanged(key)
-	end)
-	window:AddChild(expansionDropdown)
+		-- Create enemy model group
+		local enemyModelContainer = AceGUI:Create("InlineGroup")
+		window.enemyModelContainer = enemyModelContainer
+		--dropdownContainer.frame:SetBackdropColor(1, 1, 1, 0)
+		enemyModelContainer:SetWidth(rightContainer.frame:GetWidth() - 20)
+		enemyModelContainer:SetHeight(250)
+		enemyModelContainer:SetLayout("List")
+		rightContainer:AddChild(enemyModelContainer)
 
-	-- Create dungeon dropdown
-	local dungeonDropdown = AceGUI:Create("Dropdown")
-	window.dungeonDropdown = dungeonDropdown
-	dungeonDropdown:SetLabel("Dungeon:")
-	dungeonDropdown:SetList(bfaDungeons)
-	dungeonDropdown:SetValue(db.enemyGuide.dungeonIndex)
-	dungeonDropdown:SetCallback("OnValueChanged", function(widget, callbackName, key)
-		InterruptPro:OnDungeonChanged(key)
-	end)
-	window:AddChild(dungeonDropdown)
-
-	-- Create enemy downdown
-	local enemyDropdown = AceGUI:Create("Dropdown")
-	window.enemyDropdown = enemyDropdown
-	enemyDropdown:SetLabel("Enemy:")
-	enemyDropdown:SetList(atalDazarEnemies) -- TODO - Load this correctly
-	enemyDropdown:SetValue(db.enemyGuide.enemyIndex)
-	enemyDropdown:SetCallback("OnValueChanged", function(widget, callbackName, key)
-		InterruptPro:OnEnemyChanged(key)
-	end)
-	window:AddChild(enemyDropdown)
-
-	-- Create enemy model frame
-	local enemyModel = CreateFrame("PlayerModel", nil, window.frame, "ModelWithCOntrolsTemplate")
-	window.enemyModel = enemyModel
-	-- TODO - Review values
-	enemyModel:SetFrameLevel(15)
-	enemyModel:SetSize(window.frame:GetWidth()/2, window.frame:GetHeight()/2)
-	enemyModel:SetScript("OnEnter", nil)
-	enemyModel:Show()
-	enemyModel:ClearAllPoints()
-	enemyModel:SetPoint("BOTTOM", window.frame, "BOTTOM", 0, 10)
-	enemyModel:SetDisplayInfo(79568)
-	enemyModel:ResetModel()
+		-- Create enemy model
+		local enemyModel = CreateFrame("PlayerModel", nil, enemyModelContainer.frame, "ModelWithCOntrolsTemplate")
+		window.enemyModel = enemyModel
+		-- TODO - Especially review these values
+		enemyModel:SetFrameLevel(15)
+		enemyModel:SetSize(enemyModelContainer.frame:GetWidth() - 20, 245)
+		enemyModel:SetScript("OnEnter", nil)
+		enemyModel:Show()
+		enemyModel:Hide()
+		enemyModel:ClearAllPoints()
+		enemyModel:SetPoint("BOTTOM", enemyModelContainer.frame, "BOTTOM", 0, 10)
+		enemyModel:SetDisplayInfo(79568)
+		enemyModel:ResetModel()
+	end
 
 	InterruptPro:Debug("Constructed EnemyGuide frame")
 
@@ -119,10 +157,10 @@ function InterruptPro:CreateEnemyGuide()
 end
 
 local lastExpansionIndex, lastDungeonIndex, lastEnemyIndex
-function InterruptPro:UpdateEnemyGuide(expansionIndex, dungeonIndex, enemyIndex)
-	local window = InterruptPro.EnemyGuide
+function EnemyGuide:Update(expansionIndex, dungeonIndex, enemyIndex)
+	local window = EnemyGuide.Frame
 
-	window.dungeonDropdown:SetList(dungeons[expansionIndex])
+	window.dungeonDropdown:SetList(InterruptPro.dungeons[expansionIndex])
 	window.dungeonDropdown:SetValue(dungeonIndex)
 
 	local enemies = {}
@@ -139,30 +177,30 @@ function InterruptPro:UpdateEnemyGuide(expansionIndex, dungeonIndex, enemyIndex)
 	window.enemyModel:ResetModel()
 end
 
-function InterruptPro:ShowEnemyGuide()
-	InterruptPro.EnemyGuide = InterruptPro.EnemyGuide or InterruptPro:CreateEnemyGuide()
-	InterruptPro:UpdateEnemyGuide(db.enemyGuide.expansionIndex,
+function EnemyGuide:Show()
+	EnemyGuide.Frame = EnemyGuide.Frame or EnemyGuide:Create()
+	EnemyGuide:Update(db.enemyGuide.expansionIndex,
 		db.enemyGuide.dungeonIndex, db.enemyGuide.enemyIndex)
-	InterruptPro.EnemyGuide:Show()
+	EnemyGuide.Frame:Show()
 end
 
 function InterruptPro:OnExpansionChanged(expansionIndex)
 	db.enemyGuide.expansionIndex = expansionIndex
 	db.enemyGuide.dungeonIndex = 1
 	db.enemyGuide.enemyIndex = 1
-	InterruptPro:UpdateEnemyGuide(db.enemyGuide.expansionIndex,
+	EnemyGuide:Update(db.enemyGuide.expansionIndex,
 		db.enemyGuide.dungeonIndex, db.enemyGuide.enemyIndex)
 end
 
 function InterruptPro:OnDungeonChanged(dungeonIndex)
 	db.enemyGuide.dungeonIndex = dungeonIndex
 	db.enemyGuide.enemyIndex = 1
-	InterruptPro:UpdateEnemyGuide(db.enemyGuide.expansionIndex,
+	EnemyGuide:Update(db.enemyGuide.expansionIndex,
 		db.enemyGuide.dungeonIndex, db.enemyGuide.enemyIndex)
 end
 
 function InterruptPro:OnEnemyChanged(enemyIndex)
 	db.enemyGuide.enemyIndex = enemyIndex
-	InterruptPro:UpdateEnemyGuide(db.enemyGuide.expansionIndex,
+	EnemyGuide:Update(db.enemyGuide.expansionIndex,
 		db.enemyGuide.dungeonIndex, db.enemyGuide.enemyIndex)
 end

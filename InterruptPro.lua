@@ -9,7 +9,7 @@ _G["InterruptPro"] = InterruptPro -- TODO - Necessary?
 ----------------------------
 
 -- Lua API
--- string:lower()
+-- TODO
 
 -- WoW API
 
@@ -38,6 +38,9 @@ local defaultSavedVars = {
 			expansionIndex = 1,
 			dungeonIndex = 1,
 			enemyIndex = 1
+		},
+		dataScraper = {
+			enabled = false
 		},
 		devMode = {
 			enabled = false,
@@ -69,26 +72,33 @@ do
 	end
 end
 
+-------------
+-- Utility --
+-------------
+
+local AddonColor = "|c000070de"
+
+function InterruptPro:Print(text)
+	print(AddonColor .. "InterruptPro:|r " .. text)
+end
+
 -----------
 -- Debug --
 -----------
 
-local debugColor = "|c000070de"
-
 function InterruptPro:ToggleDevMode()
 	db.devMode.enabled = not db.devMode.enabled
 	if db.devMode.enabled then
-		InterruptPro:Debug("DevMode enabled")
+		InterruptPro:Print("DevMode enabled")
 	else
-		-- InteruptPro:Debug() is disabled so have to manually color text
-		print(debugColor ..  "InterruptPro:|r DevMode disabled")
+		InterruptPro:Print("DevMode disabled")
 	end
 end
 
 function InterruptPro:Debug(text, level)
 	if not db.devMode.enabled then return end
 	if (level or 1) <= db.devMode.debugLevel then
-		print(debugColor .. "InterruptPro:|r " .. text)
+		InterruptPro:Print("DEV - " .. text)
 	end
 end
 
@@ -105,8 +115,10 @@ do
 			InterruptPro:ToggleMinimapButton()
 		elseif cmd == "dev" then
 			InterruptPro:ToggleDevMode()
+		elseif cmd == "ds" then
+			InterruptPro:ToggleDataScraper()
 		else -- Default case
-			InterruptPro:ShowEnemyGuide()
+			InterruptPro.EnemyGuide:Show()
 		end
 	end
 end
@@ -129,7 +141,7 @@ do
 
 		function dataBroker.OnClick(self, button)
 			if button == "LeftButton" then
-				InterruptPro:ShowEnemyGuide()
+				InterruptPro.EnemyGuide:Show()
 			end
 			if button == "RightButton" then
 				InterruptPro:LockMinmapButton()
@@ -160,9 +172,24 @@ do
 		db.minimap.hide = not db.minimap.hide
 		if db.minimap.hide then
 			Icon:Hide("InterruptPro")
-			print("To re-enable the Interrupt Pro Minimap button type '/ip minimap'")
+			InterruptPro:Print("To re-enable the Interrupt Pro Minimap button type '/ip minimap'")
 		else
 			Icon:Show("InterruptPro")
 		end
+	end
+end
+
+-------------------
+-- Miscellaneous --
+-------------------
+
+function InterruptPro:ToggleDataScraper()
+	db.dataScraper.enable = not db.dataScraper.enable
+	if db.dataScraper.enable then
+		DataScraper:Init()
+		InterruptPro:Print("Data Scrapper enabled")
+	else
+		DataScraper:Quit()
+		InterruptPro:Print("Data scrapper disabled")
 	end
 end

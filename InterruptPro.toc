@@ -14,3 +14,5 @@ InterruptPro.lua
 
 EnemyGuide.lua
 BattleForAzeroth\bfa.xml
+
+DataScraper.lua
