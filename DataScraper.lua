@@ -1,17 +1,17 @@
 -- Made by: Dastard - Skullcrusher US - <Death and Destruction> --
 
-local InterruptPro = InterruptPro
+local IP = InterruptPro
 local db
 
--- Caches local variables
+-- Cached local variables
 local strsplit = strsplit
 
 ------------------
 -- Data Scraper --
 ------------------
 
-InterruptPro.DataScraper = {}
-local DataScraper = InterruptPro.DataScraper
+local DS = {}
+IP.DataScraper = DS
 
 local trackedEvents = {
 	["SPELL_CAST_START"] = true,
@@ -22,21 +22,21 @@ local trackedEvents = {
 	["SPELL_AURA_REMOVED"] = true
 }
 
-function DataScraper:Init()
-	db = InterruptPro:GetDB()
+function DS:Init()
+	db = IP:GetDB()
 
 	local frame = CreateFrame("Frame")
 	frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	frame:SetScript("OnEvent", function(self, event, ...)
-		DataScraper[event](self, ...)
+		DS[event](self, ...)
 	end)
 end
 
-function DataScraper:Quit()
+function DS:Quit()
 	-- TODO
 end
 
-function DataScraper:COMBAT_LOG_EVENT_UNFILTERED(self, ...)
+function DS:COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlag, sourceRaidFlags,
 		destGUID, destName, destFlags, destRaidFlags, spellId, spellName, spellSchool = CombatLogGetCurrentEventInfo()
 
@@ -52,6 +52,6 @@ function DataScraper:COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 		-- Immunity scraping
 		-- TODO
 
-		InterruptPro:Debug(sourceName .. " - " .. spellName .. "[" .. spellId .. "]")
+		IP:Debug(sourceName .. " - " .. spellName .. "[" .. spellId .. "]")
 	end
 end

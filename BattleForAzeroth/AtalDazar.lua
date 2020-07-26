@@ -8,7 +8,6 @@
 
 local dungeonId = 1
 InterruptPro.dungeonEnemies[dungeonId] = {
-
 	[1] = {
 		["id"] = 122972,
 		["name"] = "Dazar'ai Augur",

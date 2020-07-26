@@ -1,8 +1,9 @@
 -- Made by: Dastard - Skullcrusher US - <Death and Destruction> --
 
-local AddonName, InterruptPro = ... -- TODO - Necessary?
+local AddonName = ...
 
-_G["InterruptPro"] = InterruptPro -- TODO - Necessary?
+local IP = {}
+_G[AddonName] = IP
 
 ----------------------------
 -- Cached Local Variables --
@@ -20,7 +21,7 @@ local dataBroker
 -- Libraries --
 ---------------
 
-local LibStub = _G["LibStub"] -- TODO - Necessary?
+local LibStub = LibStub
 
 --------------
 -- Database --
@@ -49,7 +50,7 @@ local defaultSavedVars = {
 	}
 }
 
-function InterruptPro:GetDB()
+function IP:GetDB()
 	return db
 end
 
@@ -57,17 +58,17 @@ do
 	local frame = CreateFrame("Frame")
 	frame:RegisterEvent("ADDON_LOADED")
 	frame:SetScript("OnEvent", function(self, event, ...)
-		InterruptPro[event](self, ...)
+		IP[event](self, ...)
 	end)
 
-	function InterruptPro.ADDON_LOADED(self, addon)
+	function IP.ADDON_LOADED(self, addon)
 		if addon == "InterruptPro" then
 			local AceDB = LibStub("AceDB-3.0")
 			local Icon = LibStub("LibDBIcon-1.0")
 			db = AceDB:New("InterruptProDB", defaultSavedVars).global
 			Icon:Register("InterruptPro", dataBroker, db.minimap)
 
-			InterruptPro:Debug("DevMode enabled")
+			IP:Debug("DevMode enabled")
 		end
 	end
 end
@@ -76,29 +77,29 @@ end
 -- Utility --
 -------------
 
-local AddonColor = "|c000070de"
+local addonColor = "|c000070de"
 
-function InterruptPro:Print(text)
-	print(AddonColor .. "InterruptPro:|r " .. text)
+function IP:Print(text)
+	print(addonColor .. "InterruptPro:|r " .. text)
 end
 
 -----------
 -- Debug --
 -----------
 
-function InterruptPro:ToggleDevMode()
+function IP:ToggleDevMode()
 	db.devMode.enabled = not db.devMode.enabled
 	if db.devMode.enabled then
-		InterruptPro:Print("DevMode enabled")
+		IP:Print("DevMode enabled")
 	else
-		InterruptPro:Print("DevMode disabled")
+		IP:Print("DevMode disabled")
 	end
 end
 
-function InterruptPro:Debug(text, level)
+function IP:Debug(text, level)
 	if not db.devMode.enabled then return end
 	if (level or 1) <= db.devMode.debugLevel then
-		InterruptPro:Print("DEV - " .. text)
+		IP:Print("DEV - " .. text)
 	end
 end
 
@@ -112,13 +113,13 @@ do
 	function SlashCmdList.INTERRUPTPRO(msg)
 		local cmd = msg:lower()
 		if cmd == "minimap" then
-			InterruptPro:ToggleMinimapButton()
+			IP:ToggleMinimapButton()
 		elseif cmd == "dev" then
-			InterruptPro:ToggleDevMode()
+			IP:ToggleDevMode()
 		elseif cmd == "ds" then
-			InterruptPro:ToggleDataScraper()
+			IP:ToggleDataScraper()
 		else -- Default case
-			InterruptPro.EnemyGuide:Show()
+			IP.EnemyGuide:Show()
 		end
 	end
 end
@@ -141,25 +142,26 @@ do
 
 		function dataBroker.OnClick(self, button)
 			if button == "LeftButton" then
-				InterruptPro.EnemyGuide:Show()
+				IP.EnemyGuide:Show()
 			end
 			if button == "RightButton" then
-				InterruptPro:LockMinmapButton()
+				IP:LockMinmapButton()
 			end
 			if button == "MiddleButton" then
-				InterruptPro:ToggleMinimapButton()
+				IP:ToggleMinimapButton()
 			end
 		end
 
 		function dataBroker.OnTooltipShow(tooltip)
 			tooltip:AddLine("Interrupt Pro")
+			tooltip:AddLine(" ")
 			tooltip:AddLine("Left-click - Open Enemy Guide")
 			tooltip:AddLine("Right-click - Lock Minimap button")
 			tooltip:AddLine("Middle-click - Hide Minimap button")
 		end
 	end
 
-	function InterruptPro:LockMinmapButton()
+	function IP:LockMinmapButton()
 		db.minimap.lock = not db.minimap.lock
 		if db.minimap.lock then
 			Icon:Lock("InterruptPro")
@@ -168,11 +170,11 @@ do
 		end
 	end
 
-	function InterruptPro:ToggleMinimapButton()
+	function IP:ToggleMinimapButton()
 		db.minimap.hide = not db.minimap.hide
 		if db.minimap.hide then
 			Icon:Hide("InterruptPro")
-			InterruptPro:Print("To re-enable the Interrupt Pro Minimap button type '/ip minimap'")
+			IP:Print("To re-enable the Interrupt Pro Minimap button type '/ip minimap'")
 		else
 			Icon:Show("InterruptPro")
 		end
@@ -183,13 +185,13 @@ end
 -- Miscellaneous --
 -------------------
 
-function InterruptPro:ToggleDataScraper()
+function IP:ToggleDataScraper()
 	db.dataScraper.enable = not db.dataScraper.enable
 	if db.dataScraper.enable then
 		DataScraper:Init()
-		InterruptPro:Print("Data Scrapper enabled")
+		IP:Print("Data Scrapper enabled")
 	else
 		DataScraper:Quit()
-		InterruptPro:Print("Data scrapper disabled")
+		IP:Print("Data scrapper disabled")
 	end
 end

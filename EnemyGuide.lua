@@ -1,20 +1,20 @@
 -- Made by: Dastard - Skullcrusher US - <Death and Destruction> --
 
-local InterruptPro = InterruptPro
+local IP = InterruptPro
 local db
 
--- Caches local variables
+-- Cached local variables
 -- TODO
 
 -----------------
 -- Enemy Guide --
 -----------------
 
-InterruptPro.EnemyGuide = {}
-local EnemyGuide = InterruptPro.EnemyGuide
+local EG = {}
+IP.EnemyGuide = EG
 
-InterruptPro.dungeons = {}
-InterruptPro.dungeonEnemies = {}
+IP.dungeons = {}
+IP.dungeonEnemies = {}
 
 local expansions = {
 	[1] = "Battle for Azeroth",
@@ -47,13 +47,13 @@ local shadowlandsDungeons = {
 	[8] = "Spires of Ascension"
 }
 
-InterruptPro.dungeons = {
+IP.dungeons = {
 	[1] = bfaDungeons,
 	[2] = shadowlandsDungeons
 }
 
-function EnemyGuide:Create()
-	db = InterruptPro:GetDB()
+function EG:Create()
+	db = IP:GetDB()
 
 	local AceGUI = LibStub("AceGUI-3.0")
 
@@ -92,7 +92,7 @@ function EnemyGuide:Create()
 		expansionDropdown:SetValue(db.enemyGuide.expansionIndex)
 		--expansionDropdown:SetWidth(dropdownContainer.frame:GetWidth() - 25)
 		expansionDropdown:SetCallback("OnValueChanged", function(widget, callbackName, key)
-			InterruptPro:OnExpansionChanged(key)
+			IP:OnExpansionChanged(key)
 		end)
 		dropdownContainer:AddChild(expansionDropdown)
 
@@ -102,7 +102,7 @@ function EnemyGuide:Create()
 		dungeonDropdown:SetLabel("Dungeon:")
 		--dungeonDropdown:SetWidth(dropdownContainer.frame:GetWidth() - 25)
 		dungeonDropdown:SetCallback("OnValueChanged", function(widget, callbackN1ame, key)
-			InterruptPro:OnDungeonChanged(key)
+			IP:OnDungeonChanged(key)
 		end)
 		dropdownContainer:AddChild(dungeonDropdown)
 
@@ -112,7 +112,7 @@ function EnemyGuide:Create()
 		enemyDropdown:SetLabel("Enemy:")
 		--enemyDropdown:SetWidth(dropdownContainer.frame:GetWidth() - 25)
 		enemyDropdown:SetCallback("OnValueChanged", function(widget, callbackName, key)
-			InterruptPro:OnEnemyChanged(key)
+			IP:OnEnemyChanged(key)
 		end)
 		dropdownContainer:AddChild(enemyDropdown)
 	end
@@ -151,20 +151,20 @@ function EnemyGuide:Create()
 		enemyModel:ResetModel()
 	end
 
-	InterruptPro:Debug("Constructed EnemyGuide frame")
+	IP:Debug("Constructed EnemyGuide frame")
 
 	return window
 end
 
 local lastExpansionIndex, lastDungeonIndex, lastEnemyIndex
-function EnemyGuide:Update(expansionIndex, dungeonIndex, enemyIndex)
-	local window = EnemyGuide.Frame
+function EG:Update(expansionIndex, dungeonIndex, enemyIndex)
+	local window = EG.Frame
 
-	window.dungeonDropdown:SetList(InterruptPro.dungeons[expansionIndex])
+	window.dungeonDropdown:SetList(IP.dungeons[expansionIndex])
 	window.dungeonDropdown:SetValue(dungeonIndex)
 
 	local enemies = {}
-	for indx,info in ipairs(InterruptPro.dungeonEnemies[dungeonIndex]) do
+	for indx,info in ipairs(IP.dungeonEnemies[dungeonIndex]) do
 		tinsert(enemies, indx, info.name)
 	end
 
@@ -172,35 +172,35 @@ function EnemyGuide:Update(expansionIndex, dungeonIndex, enemyIndex)
 	window.enemyDropdown:SetValue(enemyIndex)
 
 	-- Data
-	local enemyData = InterruptPro.dungeonEnemies[dungeonIndex][enemyIndex]
+	local enemyData = IP.dungeonEnemies[dungeonIndex][enemyIndex]
 	window.enemyModel:SetDisplayInfo(enemyData.displayId)
 	window.enemyModel:ResetModel()
 end
 
-function EnemyGuide:Show()
-	EnemyGuide.Frame = EnemyGuide.Frame or EnemyGuide:Create()
-	EnemyGuide:Update(db.enemyGuide.expansionIndex,
+function EG:Show()
+	EG.Frame = EG.Frame or EG:Create()
+	EG:Update(db.enemyGuide.expansionIndex,
 		db.enemyGuide.dungeonIndex, db.enemyGuide.enemyIndex)
-	EnemyGuide.Frame:Show()
+	EG.Frame:Show()
 end
 
-function InterruptPro:OnExpansionChanged(expansionIndex)
+function IP:OnExpansionChanged(expansionIndex)
 	db.enemyGuide.expansionIndex = expansionIndex
 	db.enemyGuide.dungeonIndex = 1
 	db.enemyGuide.enemyIndex = 1
-	EnemyGuide:Update(db.enemyGuide.expansionIndex,
+	EG:Update(db.enemyGuide.expansionIndex,
 		db.enemyGuide.dungeonIndex, db.enemyGuide.enemyIndex)
 end
 
-function InterruptPro:OnDungeonChanged(dungeonIndex)
+function IP:OnDungeonChanged(dungeonIndex)
 	db.enemyGuide.dungeonIndex = dungeonIndex
 	db.enemyGuide.enemyIndex = 1
-	EnemyGuide:Update(db.enemyGuide.expansionIndex,
+	EG:Update(db.enemyGuide.expansionIndex,
 		db.enemyGuide.dungeonIndex, db.enemyGuide.enemyIndex)
 end
 
-function InterruptPro:OnEnemyChanged(enemyIndex)
+function IP:OnEnemyChanged(enemyIndex)
 	db.enemyGuide.enemyIndex = enemyIndex
-	EnemyGuide:Update(db.enemyGuide.expansionIndex,
+	EG:Update(db.enemyGuide.expansionIndex,
 		db.enemyGuide.dungeonIndex, db.enemyGuide.enemyIndex)
 end
