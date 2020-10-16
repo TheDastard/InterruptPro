@@ -77,15 +77,28 @@ end
 -- Utility --
 -------------
 
-local addonColor = "|c000070de"
+local addonColor = "|c00e6cc80" -- Artifact Light Gold
+local cmdColor1 = "|c00ff8000" -- Legendary Orange
+local cmdColor2 = "|c00ffff00" -- System Yellow
 
 function IP:Print(text)
 	print(addonColor .. "InterruptPro:|r " .. text)
 end
 
+function IP:Help()
+	IP:Print("Slash Commands:")
+	IP:Print(cmdColor1 .. "/ip|r: Toggles the Enemy Guide")
+	IP:Print(cmdColor1 .. "/ip|r " .. cmdColor2 .. "help|r: Displays available Slash Commands")
+	IP:Print(cmdColor1 .. "/ip|r " .. cmdColor2 .. "minimap|r: Toggles the Minimap Icon")
+	IP:Print(cmdColor1 .. "/ip|r " .. cmdColor2 .. "ds|r: Toggles the Data Scraper")
+	IP:Print(cmdColor1 .. "/ip|r " .. cmdColor2 .. "dev|r: Toggles Dev Mode")
+end
+
 -----------
 -- Debug --
 -----------
+
+local debugColor = "|c0000ccff" -- Blizzard Blue
 
 function IP:ToggleDevMode()
 	db.devMode.enabled = not db.devMode.enabled
@@ -99,7 +112,7 @@ end
 function IP:Debug(text, level)
 	if not db.devMode.enabled then return end
 	if (level or 1) <= db.devMode.debugLevel then
-		IP:Print("DEV - " .. text)
+		IP:Print(debugColor .. "DEBUG|r " .. text)
 	end
 end
 
@@ -112,12 +125,14 @@ do
 
 	function SlashCmdList.INTERRUPTPRO(msg)
 		local cmd = msg:lower()
-		if cmd == "minimap" then
+		if cmd == "help" then
+			IP:Help()
+		elseif cmd == "minimap" then
 			IP:ToggleMinimapButton()
-		elseif cmd == "dev" then
-			IP:ToggleDevMode()
 		elseif cmd == "ds" then
 			IP:ToggleDataScraper()
+		elseif cmd == "dev" then
+			IP:ToggleDevMode()
 		else -- Default case
 			IP.EnemyGuide:Show()
 		end
@@ -155,9 +170,9 @@ do
 		function dataBroker.OnTooltipShow(tooltip)
 			tooltip:AddLine("Interrupt Pro")
 			tooltip:AddLine(" ")
-			tooltip:AddLine("Left-click - Open Enemy Guide")
-			tooltip:AddLine("Right-click - Lock Minimap button")
-			tooltip:AddLine("Middle-click - Hide Minimap button")
+			tooltip:AddLine("Left-click to open Enemy Guide")
+			tooltip:AddLine("Right-click to lock Minimap button")
+			tooltip:AddLine("Middle-click to hide Minimap button")
 		end
 	end
 
