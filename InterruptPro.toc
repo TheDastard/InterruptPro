@@ -14,5 +14,6 @@ InterruptPro.lua
 
 EnemyGuide.lua
 BattleForAzeroth\bfa.xml
+Shadowlands\sl.xml
 
 DataScraper.lua

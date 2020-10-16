@@ -41,10 +41,10 @@ local shadowlandsDungeons = {
 	[2] = "Halls of Atonement",
 	[3] = "Mists of Tirna Scithe",
 	[4] = "Plaguefall",
-	[5] = "The Necrotic Wake",
-	[6] = "Theater of Pain",
-	[7] = "Sanguine Depths",
-	[8] = "Spires of Ascension"
+	[5] = "Sanguine Depths",
+	[6] = "Spires of Ascension",
+	[7] = "The Necrotic Wake",
+	[8] = "Theater of Pain"
 }
 
 IP.dungeons = {
@@ -137,7 +137,7 @@ function EG:Create()
 		rightContainer:AddChild(enemyModelContainer)
 
 		-- Create enemy model
-		local enemyModel = CreateFrame("PlayerModel", nil, enemyModelContainer.frame, "ModelWithCOntrolsTemplate")
+		local enemyModel = CreateFrame("PlayerModel", nil, enemyModelContainer.frame, "ModelWithControlsTemplate")
 		window.enemyModel = enemyModel
 		-- TODO - Especially review these values
 		enemyModel:SetFrameLevel(15)
@@ -173,7 +173,7 @@ function EG:Update(expansionIndex, dungeonIndex, enemyIndex)
 
 	-- Data
 	local enemyData = IP.dungeonEnemies[dungeonIndex][enemyIndex]
-	window.enemyModel:SetDisplayInfo(enemyData.displayId)
+	window.enemyModel:SetDisplayInfo(enemyData.displayId or 79568)
 	window.enemyModel:ResetModel()
 end
 
